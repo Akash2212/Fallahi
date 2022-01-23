@@ -9,26 +9,6 @@ import database from '@react-native-firebase/database'
 
 const Stack = createNativeStackNavigator();
 
-var user = auth().currentUser
-
-if (user == null) {
-    auth()
-        .signInAnonymously()
-        .then(() => {
-            console.log('User signed in anonymously');
-        })
-        .catch(error => {
-            if (error.code === 'auth/operation-not-allowed') {
-                console.log('Enable anonymous in your firebase console.');
-            }
-
-            console.error(error);
-        });
-}
-
-
-
-
 
 export default class App extends Component {
 
@@ -44,8 +24,43 @@ export default class App extends Component {
     componentDidMount() {
         this.timeoutHandle = setTimeout(() => {
 
-            if (user != null) {
+            var user = auth().currentUser
 
+            if (user == null) {
+                auth()
+                    .signInAnonymously()
+                    .then(() => {
+                        console.log('User signed in anonymously');
+                        database().ref('Users/' + user.uid)
+                            .once('value')
+                            .then(snapshot => {
+                                if (snapshot.exists()) {
+                                    console.log('Exists')
+                                    this.setState({ component: <MainScreen /> })
+                                }
+                                else {
+                                    console.log("Does not exists")
+                                    this.setState({
+                                        component:
+                                            <NavigationContainer>
+                                                <Stack.Navigator screenOptions={{ headerShown: false }}  >
+                                                    <Stack.Screen name="EnterEmail" component={EnterEmail} />
+                                                    <Stack.Screen name="MainScreen" component={MainScreen} /></Stack.Navigator>
+                                            </NavigationContainer>
+                                    })
+                                }
+                            })
+
+                    })
+                    .catch(error => {
+                        if (error.code === 'auth/operation-not-allowed') {
+                            console.log('Enable anonymous in your firebase console.');
+                        }
+
+                        console.error(error);
+                    });
+            }
+            else {
                 database().ref('Users/' + user.uid)
                     .once('value')
                     .then(snapshot => {
@@ -66,6 +81,7 @@ export default class App extends Component {
                         }
                     })
             }
+
 
         }, 1000);
 
