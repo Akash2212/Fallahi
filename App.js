@@ -1,102 +1,82 @@
-import React, { Component } from 'react';
-import Splash from './screens/Splash'
-import MainScreen from './screens/MainScreen'
-import EnterEmail from './screens/EnterEmail'
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database'
+import auth from "@react-native-firebase/auth";
+import database from "@react-native-firebase/database";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Component } from "react";
+import EnterEmail from "./screens/EnterEmail";
+import MainScreen from "./screens/MainScreen";
+import Splash from "./screens/Splash";
 
 const Stack = createNativeStackNavigator();
 
+const SPLASH_SCREEN = "splashScreen";
+const MAIN_SCREEN = "mainScreen";
+const NAVIGATION_SCREEN = "navigation";
+
+const getComponentToRender = async (userId) => {
+  const snapshot = await database().ref(`Users/${userId}`).once("value");
+
+  if (snapshot.exists()) {
+    console.log("Exists");
+    return MAIN_SCREEN;
+  }
+
+  console.log("Does not exists");
+  return NAVIGATION_SCREEN;
+};
 
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      componentToRender: SPLASH_SCREEN,
+    };
+    console.disableYellowBox = true;
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            component: <Splash />,
-        };
-        console.disableYellowBox = true
+  async componentDidMount() {
+    this.timeoutHandle = setTimeout(() => {
+      let user = auth().currentUser;
+
+      if (user == null) {
+        try {
+          user = await auth().signInAnonymously();
+        } catch (error) {
+          if (error.code === "auth/operation-not-allowed") {
+            console.log("Enable anonymous in your firebase console.");
+          }
+
+          console.error(error);
+          return;
+        }
+      }
+
+      const componentToRender = getComponentToRender(user);
+      this.setState({ componentToRender });
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.timeoutHandle);
+  }
+
+  render() {
+    const { componentToRender } = this.state;
+
+    if (componentToRender === MAIN_SCREEN) {
+      return <MainScreen />;
     }
 
-
-    componentDidMount() {
-        this.timeoutHandle = setTimeout(() => {
-
-            var user = auth().currentUser
-
-            if (user == null) {
-                auth()
-                    .signInAnonymously()
-                    .then(() => {
-                        console.log('User signed in anonymously');
-                        var current = auth().currentUser
-                        database().ref('Users/' + current.uid)
-                            .once('value')
-                            .then(snapshot => {
-                                if (snapshot.exists()) {
-                                    console.log('Exists')
-                                    this.setState({ component: <MainScreen /> })
-                                }
-                                else {
-                                    console.log("Does not exists")
-                                    this.setState({
-                                        component:
-                                            <NavigationContainer>
-                                                <Stack.Navigator screenOptions={{ headerShown: false }}  >
-                                                    <Stack.Screen name="EnterEmail" component={EnterEmail} />
-                                                    <Stack.Screen name="MainScreen" component={MainScreen} /></Stack.Navigator>
-                                            </NavigationContainer>
-                                    })
-                                }
-                            })
-
-                    })
-                    .catch(error => {
-                        if (error.code === 'auth/operation-not-allowed') {
-                            console.log('Enable anonymous in your firebase console.');
-                        }
-
-                        console.error(error);
-                    });
-            }
-            else {
-                database().ref('Users/' + user.uid)
-                    .once('value')
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            console.log('Exists')
-                            this.setState({ component: <MainScreen /> })
-                        }
-                        else {
-                            console.log("Does not exists")
-                            this.setState({
-                                component:
-                                    <NavigationContainer>
-                                        <Stack.Navigator screenOptions={{ headerShown: false }}  >
-                                            <Stack.Screen name="EnterEmail" component={EnterEmail} />
-                                            <Stack.Screen name="MainScreen" component={MainScreen} /></Stack.Navigator>
-                                    </NavigationContainer>
-                            })
-                        }
-                    })
-            }
-
-
-        }, 1000);
-
-
+    if (componentToRender === NAVIGATION_SCREEN) {
+      return (
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="EnterEmail" component={EnterEmail} />
+            <Stack.Screen name="MainScreen" component={MainScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      );
     }
 
-    componentWillUnmount() {
-        clearTimeout(this.timeoutHandle);
-    }
-
-
-
-    render() {
-        return (this.state.component)
-
-    }
+    return <Splash />;
+  }
 }
