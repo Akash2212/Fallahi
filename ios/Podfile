@@ -30,6 +30,3 @@ target 'Falahi' do
 end
 
 
-target 'app' do
-  pod 'RNFBDatabase', :path => '../node_modules/@react-native-firebase/database'
-end
