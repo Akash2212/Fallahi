@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "494282567914",
+    "project_id": "fallahi-15cc0",
+    "storage_bucket": "fallahi-15cc0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494282567914:android:35081508b75125fc62e793",
+        "android_client_info": {
+          "package_name": "com.falahi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "494282567914-le3gt5ggens4ok5272gc10p4ka0g8h56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrs_yWPm380YE3lqDxrF-u5vubcN9OAVg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "494282567914-le3gt5ggens4ok5272gc10p4ka0g8h56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494282567914:android:608040043d3cbb6d62e793",
+        "android_client_info": {
+          "package_name": "com.fallahi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "494282567914-le3gt5ggens4ok5272gc10p4ka0g8h56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrs_yWPm380YE3lqDxrF-u5vubcN9OAVg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "494282567914-le3gt5ggens4ok5272gc10p4ka0g8h56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
