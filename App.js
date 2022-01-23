@@ -31,7 +31,8 @@ export default class App extends Component {
                     .signInAnonymously()
                     .then(() => {
                         console.log('User signed in anonymously');
-                        database().ref('Users/' + user.uid)
+                        var current = auth().currentUser
+                        database().ref('Users/' + current.uid)
                             .once('value')
                             .then(snapshot => {
                                 if (snapshot.exists()) {
