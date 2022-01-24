@@ -13,6 +13,7 @@ export default class EnterEmail extends Component {
         this.state = {
             text: ''
         }
+        this.upload = this.upload.bind(this);
     }
 
     upload() {
@@ -30,9 +31,27 @@ export default class EnterEmail extends Component {
                         this.props.navigation.replace('MainScreen')
                     })
             }
-        }
-        else {
-
+            else {
+                auth().signInAnonymously()
+                auth().onAuthStateChanged(firebaseUser => {
+                    if (firebaseUser) {
+                        database().ref('Users/' + firebaseUser.uid)
+                            .set({
+                                email: this.state.text,
+                                title: 'null',
+                                message: 'null',
+                                sendMessage: 'null',
+                                platform: Platform.OS
+                            })
+                            .then(() => {
+                                this.props.navigation.replace('MainScreen')
+                            })
+                    }
+                    else {
+                        console.log('User doest not signed in')
+                    }
+                })
+            }
         }
     }
 
