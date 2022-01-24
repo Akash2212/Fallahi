@@ -14,87 +14,64 @@ const NAVIGATION_SCREEN = "navigation";
 const Stack = createNativeStackNavigator();
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      componentToRender: SPLASH_SCREEN,
-    };
-    console.disableYellowBox = true;
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            componentToRender: SPLASH_SCREEN,
+        };
+        console.disableYellowBox = true;
+    }
 
-  componentDidMount() {
-    this.timeoutHandle = setTimeout(() => {
-      var user = auth().currentUser;
+    componentDidMount() {
+        this.timeoutHandle = setTimeout(() => {
+            var user = auth().currentUser;
 
-      if (user == null) {
-        auth()
-          .signInAnonymously()
-          .then(() => {
-            console.log("User signed in anonymously");
-            var current = auth().currentUser;
-            database()
-              .ref("Users/" + current.uid)
-              .once("value")
-              .then((snapshot) => {
-                if (snapshot.exists()) {
-                  console.log("Exists");
-                  this.setState({ componentToRender: MAIN_SCREEN });
-                } else {
-                  console.log("Does not exists");
-                  this.setState({
+            if (user == null) {
+                this.setState({
                     componentToRender: NAVIGATION_SCREEN,
-                  });
-                }
-              });
-          })
-          .catch((error) => {
-            if (error.code === "auth/operation-not-allowed") {
-              console.log("Enable anonymous in your firebase console.");
-            }
+                });
 
-            console.error(error);
-          });
-      } else {
-        database()
-          .ref("Users/" + user.uid)
-          .once("value")
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              console.log("Exists");
-              this.setState({ componentToRender: MAIN_SCREEN });
             } else {
-              console.log("Does not exists");
-              this.setState({
-                componentToRender: NAVIGATION_SCREEN,
-              });
+                database()
+                    .ref("Users/" + user.uid)
+                    .once("value")
+                    .then((snapshot) => {
+                        if (snapshot.exists()) {
+                            console.log("Exists");
+                            this.setState({ componentToRender: MAIN_SCREEN });
+                        } else {
+                            console.log("Does not exists");
+                            this.setState({
+                                componentToRender: NAVIGATION_SCREEN,
+                            });
+                        }
+                    });
             }
-          });
-      }
-    }, 1000);
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.timeoutHandle);
-  }
-
-  render() {
-    const { componentToRender } = this.state;
-
-    if (componentToRender === MAIN_SCREEN) {
-      return <MainScreen />;
+        }, 1000);
     }
 
-    if (componentToRender === NAVIGATION_SCREEN) {
-      return (
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="EnterEmail" component={EnterEmail} />
-            <Stack.Screen name="MainScreen" component={MainScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      );
+    componentWillUnmount() {
+        clearTimeout(this.timeoutHandle);
     }
 
-    return <Splash />;
-  }
+    render() {
+        const { componentToRender } = this.state;
+
+        if (componentToRender === MAIN_SCREEN) {
+            return <MainScreen />;
+        }
+
+        if (componentToRender === NAVIGATION_SCREEN) {
+            return (
+                <NavigationContainer>
+                    <Stack.Navigator screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="EnterEmail" component={EnterEmail} />
+                        <Stack.Screen name="MainScreen" component={MainScreen} />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            );
+        }
+
+        return <Splash />;
+    }
 }
